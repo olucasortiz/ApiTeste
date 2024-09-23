@@ -1,6 +1,7 @@
 package com.api.crud.model;
-
 import jakarta.persistence.*;
+
+import org.antlr.v4.runtime.misc.NotNull;
 import org.apache.juli.logging.Log;
 //@entity esta falando para nossa IDE que estamos usando uma anotacao
 //especificar a utilidade de algo
@@ -10,10 +11,9 @@ import org.apache.juli.logging.Log;
 
 public class Product {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    //esta usando essas anotações para gerar um id automaticamente em cada cadastro
-    //evitar o cadastro de id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
     private String name;
     private Long price;
 
