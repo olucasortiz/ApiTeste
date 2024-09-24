@@ -2,23 +2,18 @@ package com.api.crud.controllers;
 
 import com.api.crud.model.Product;
 import com.api.crud.repositories.ProductRepository;
-import org.apache.coyote.Response;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.repository.query.FluentQuery;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+
 
 @RestController
 //estou informando para a IDE que no momento que ela compila o projeto toda a classe se trata
@@ -44,6 +39,9 @@ public class ProductController {//serve para receber as requisições http e dev
         return ResponseEntity.status(HttpStatus.OK).body(listProducts);
     }
 
+    @Operation(description = "Busca o Produto pelo ID")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Retorna o Produto com seus dados"),
+    @ApiResponse(responseCode = "400", description = "Não existe produto com esse Id")})
     @GetMapping("/by-id")
     public ResponseEntity getProductById(@RequestParam Integer id) {
         Optional<Product> product = repository.findById(id);
@@ -53,8 +51,13 @@ public class ProductController {//serve para receber as requisições http e dev
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
+    @Operation(description = "Cria um novo Produto")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Produto criado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Erro ao criar o produto")
+    })
     @PostMapping("/create-product")
-    public ResponseEntity createProduct(@RequestBody Product product) {
+    public ResponseEntity createProduct(@   Valid @RequestBody Product product) {
         Product savedProduct = repository.save(product);
         if (savedProduct != null) {
             return ResponseEntity.status(HttpStatus.CREATED).body(savedProduct);
@@ -62,6 +65,11 @@ public class ProductController {//serve para receber as requisições http e dev
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 
+    @Operation(description = "Atualiza um Produto existente")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Produto atualizado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Produto não encontrado para o ID fornecido")
+    })
     @PutMapping("/update-product")
     public ResponseEntity updateProduct(@RequestBody Product product) {
         Optional<Product> productOptional = repository.findById(product.getId());//optional pois ele pode nao existir
@@ -76,6 +84,11 @@ public class ProductController {//serve para receber as requisições http e dev
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
+    @Operation(description = "Deleta um Produto")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Produto deletado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Produto não encontrado para o ID fornecido")
+    })
     @DeleteMapping("delete-product")
     public ResponseEntity deleteProduct(@RequestParam Integer id) {
         Optional<Product> productOptional = repository.findById(id);
@@ -85,7 +98,11 @@ public class ProductController {//serve para receber as requisições http e dev
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
-
+    @Operation(description = "Busca Produtos pelo nome")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Produtos encontrados com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Nenhum produto encontrado com o nome fornecido")
+    })
     @GetMapping("/by-name")
     public ResponseEntity getProductByNome(@RequestParam String name) {
         List<Product> products = repository.findByName(name);
